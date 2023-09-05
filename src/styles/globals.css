@@ -1,0 +1,125 @@
+.icon-fiesta {
+    /* background-image: url(./vector.svg); */
+    background-size: 100% 100%;
+    height: 16px;
+    position: relative;
+    width: 16px;
+  }
+  
+  .icon-fiesta .vector-stroke {
+    height: 14px;
+    left: 1px;
+    position: absolute;
+    top: 1px;
+    width: 14px;
+  }
+
+  .tags-novedades {
+    align-items: center;
+    background-color: #f8f8f8;
+    border-radius: 100px;
+    box-shadow: 0px 4.35px 10.86px #00000040;
+    display: flex;
+    gap: 8.07px;
+    height: 30px;
+    justify-content: center;
+    padding: 6.45px 14.52px;
+    position: relative;
+    width: 46px;
+  }
+  
+  .tags-novedades .icon-fiesta {
+    height: 16px !important;
+    position: relative !important;
+    width: 16px !important;
+  }
+  
+  .type-desktop-value {
+    align-items: flex-start;
+    border-radius: 16px;
+    display: inline-flex;
+    position: relative;
+  }
+  
+  .type-desktop-value .imagen {
+    background-color: #788082;
+    border-radius: 16px 0px 0px 16px;
+    height: 116px;
+    opacity: 0.8;
+    position: relative;
+    width: 154px;
+  }
+  
+  .type-desktop-value .tags-novedades-instance {
+    left: 100px !important;
+    top: 8px !important;
+  }
+  
+  .type-desktop-value .CONT {
+    align-items: flex-start;
+    background-color: white;
+    border-radius: 0px 16px 16px 0px;
+    display: flex;
+    flex-direction: column;
+    height: 116px;
+    justify-content: space-between;
+    padding: 16px 24px;
+    position: relative;
+    width: 191.78px;
+  }
+  
+  .type-desktop-value .text-wrapper {
+    color: blue;
+    font-family: var(--t-tulo-t-tulo-m-font-family);
+    font-size: var(--t-tulo-t-tulo-m-font-size);
+    font-style: var(--t-tulo-t-tulo-m-font-style);
+    font-weight: var(--t-tulo-t-tulo-m-font-weight);
+    letter-spacing: var(--t-tulo-t-tulo-m-letter-spacing);
+    line-height: var(--t-tulo-t-tulo-m-line-height);
+    margin-right: -8.22px;
+    margin-top: -0.67px;
+    position: relative;
+    width: 152px;
+  }
+  
+  .type-desktop-value .div {
+    align-items: flex-start;
+    display: inline-flex;
+    flex: 0 0 auto;
+    gap: 8px;
+    position: relative;
+  }
+  
+  .type-desktop-value .icon-fecha {
+    height: 16px !important;
+    position: relative !important;
+    width: 16px !important;
+  }
+  
+  .type-desktop-value .text-wrapper-2 {
+    color: var(--colors-main-colors-primary);
+    font-family: var(--men-men-s-font-family);
+    font-size: var(--men-men-s-font-size);
+    font-style: var(--men-men-s-font-style);
+    font-weight: var(--men-men-s-font-weight);
+    letter-spacing: var(--men-men-s-letter-spacing);
+    line-height: var(--men-men-s-line-height);
+    margin-top: -1px;
+    position: relative;
+    white-space: nowrap;
+    width: fit-content;
+  }
+  
+  .label .text-wrapper {
+    color: var(--mainprimary);
+    font-family: var(--men-men-s-font-family);
+    font-size: var(--men-men-s-font-size);
+    font-style: var(--men-men-s-font-style);
+    font-weight: var(--men-men-s-font-weight);
+    left: 0;
+    letter-spacing: var(--men-men-s-letter-spacing);
+    line-height: var(--men-men-s-line-height);
+    position: fixed;
+    top: 0;
+    white-space: nowrap;
+  }
