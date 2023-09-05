@@ -1,0 +1,28 @@
+.table-container {
+    box-shadow: rgba(50, 50, 93, 0.25) 0px 13px 27px -5px, rgba(0, 0, 0, 0.3) 0px 8px 16px -8px;
+    border-radius: 6px;
+    background-color: #fff;
+    padding: 20px;
+    margin-top: 20px;
+    width: 100%;
+}
+
+.button {
+    padding-left: 32px;
+    padding-right: 32px;
+    border-radius: 8px;
+
+    @media screen and (max-width: 768px) {
+        padding: 0;
+    }
+}
+
+.icon {
+    margin-right: 5px;
+}
+
+.fab {
+    position: absolute;
+    bottom: 30px;
+    right: 16px;
+}

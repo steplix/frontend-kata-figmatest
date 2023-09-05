@@ -1,0 +1,217 @@
+AWSTemplateFormatVersion: 2010-09-09
+Description: >-
+  Log group, Parameters on SSM Parameter Store, Task definition, Listeners on load balancer, Service discovery and ECS service definition. 
+  It is a pre-requisite to have created a VPC, an ECS cluster, an ECR register and a Load Balancer to proceed with the execution of this template.
+Parameters:
+  Port:
+    Type: Number
+    Default: 65098
+    Description: Service and container port
+  Environment:
+    Type: String
+    Default: "testing"
+    Description: Stack creation environment
+  ParameterSuffix:
+    Type: String
+    Default: "Testing"
+    Description: Capitalized environment. Capitalize macro on CloudFormation requires a lot of boilerplate
+  # ENV_AWS_ECS_NAME
+  EnvAwsECSName:
+    Type: String
+    Default: "fe-landing"
+    Description: Service name on AWS ECS cluster
+  # AWS_DEPLOY_VPC_ID
+  EnvAwsVpcId:
+    Type: "AWS::EC2::VPC::Id"
+    Default: "vpc-0ea3bff1fafe3b896"
+    Description: VpcId of your existing Virtual Private Cloud (VPC)
+    ConstraintDescription: >-
+      must be the VPC Id of an existing Virtual Private Cloud. Outbound traffic
+      for the default security group associated with this VPC should be enabled.
+  # AWS_DEPLOY_LOADBALANCER_ARN_TESTING
+  EnvAwsLoadBalancerARN:
+    Type: String
+    Default: >-
+      arn:aws:elasticloadbalancing:us-east-1:977408149976:loadbalancer/net/ag-testing-nlb/c98ac8a0bf870245
+    Description: ARN to load balancer
+  # AWS_DEPLOY_REGION
+  EnvAwsRegion:
+    Type: String
+    Default: "us-east-1"
+    Description: AWS enviroment region
+  # AWS_DEPLOY_ACCOUNT_ID
+  EnvAwsAccount:
+    Type: String
+    Default: "977408149976"
+    Description: AWS enviroment account ID
+  # GitlabSlugProyect:desiredVersion
+  EnvAwsECRImage:
+    Type: String
+    Default: "agrocanje-fe-lading:e4aa074f"
+    Description: AWS ECR image name and version
+  # ENV_DOCKER_CLUSTER_TESTING
+  EnvAwsECSCluster:
+    Type: String
+    Default: "ag-testing-ecs"
+    Description: AWS ECS cluster name
+  # AWS_SERVICE_NAMESPACE_TESTING
+  EnvAwsServiceNamespace:
+    Type: String
+    Default: "ns-tapakwkd2saldf6n"
+    Description: The ID of the namespace that was used to create the service. AWS Cloud Map namespace ID.
+  # AWS_TAG_PROJECT
+  EnvAwsTagProject:
+    Type: String
+    Default: "agrocanje"
+    Description: TAG Project to add into the resouces
+  EnvContainerMemoryReservation:
+    Type: Number
+    Default: 90
+    Description: Task Definition MemoryReservation property
+  EnvTaskMemory:
+    Type: String
+    Default: "150"
+    Description: Task Definition Memory property
+Conditions:
+  CreateNoProdResources: !Not [!Equals [!Ref Environment, production]]
+Resources:
+  # Log Group
+  LogGroup:
+    Type: "AWS::Logs::LogGroup"
+    Properties:
+      LogGroupName: !Sub "/ecs/${EnvAwsECSName}-${Environment}"
+      RetentionInDays: 7
+  # Parameter store
+  ParameterPort:
+    Type: "AWS::SSM::Parameter"
+    Condition: "CreateNoProdResources"
+    Properties:
+      Name: !Sub "AGLandingPort${ParameterSuffix}"
+      Description: port of the service
+      Tier: Standard
+      Type: String
+      Value: !Ref Port
+  ParameterPublicURL:
+    Type: "AWS::SSM::Parameter"
+    Condition: "CreateNoProdResources"
+    Properties:
+      Name: !Sub "AGLandingAppURL${ParameterSuffix}"
+      Description: aglanding public url
+      Tier: Standard
+      Type: String
+      Value: "https://landing-test.agrocanje.com"
+  ParameterApiURL:
+    Type: "AWS::SSM::Parameter"
+    Condition: "CreateNoProdResources"
+    Properties:
+      Name: !Sub "AGLandingApiURL${ParameterSuffix}"
+      Description: Agrocanje API url
+      Tier: Standard
+      Type: String
+      Value: "https://api-test.agrocanje.com"
+  # TaskDefinition
+  TaskDefinition:
+    Type: "AWS::ECS::TaskDefinition"
+    Properties:
+      ExecutionRoleArn: !Sub "arn:aws:iam::${EnvAwsAccount}:role/ecsTaskExecutionRole"
+      ContainerDefinitions:
+        - LogConfiguration:
+            LogDriver: awslogs
+            Options:
+              awslogs-group: !Sub "/ecs/${EnvAwsECSName}-${Environment}"
+              awslogs-region: !Ref EnvAwsRegion
+              awslogs-stream-prefix: ecs
+          PortMappings:
+            - HostPort: !Ref Port
+              Protocol: tcp
+              ContainerPort: !Ref Port
+          Cpu: 0
+          Secrets:
+            - Name: PORT
+              ValueFrom: !Sub "arn:aws:ssm:${EnvAwsRegion}:${EnvAwsAccount}:parameter/AGLandingPort${ParameterSuffix}"
+            - Name: NODE_ENV
+              ValueFrom: !Sub "arn:aws:ssm:${EnvAwsRegion}:${EnvAwsAccount}:parameter/AGNodeEnv${ParameterSuffix}"
+            - Name: APP_URL
+              ValueFrom: !Sub "arn:aws:ssm:${EnvAwsRegion}:${EnvAwsAccount}:parameter/AGLandingAppURL${ParameterSuffix}"
+            - Name: API_URL
+              ValueFrom: !Sub "arn:aws:ssm:${EnvAwsRegion}:${EnvAwsAccount}:parameter/AGLandingApiURL${ParameterSuffix}"
+          MountPoints: []
+          MemoryReservation: !Ref EnvContainerMemoryReservation
+          VolumesFrom: []
+          Image: !Sub "${EnvAwsAccount}.dkr.ecr.${EnvAwsRegion}.amazonaws.com/${EnvAwsECRImage}"
+          Name: !Sub "${EnvAwsECSName}-${Environment}"
+      Memory: !Ref EnvTaskMemory
+      TaskRoleArn: !Sub "arn:aws:iam::${EnvAwsAccount}:role/ecsTaskExecutionRole"
+      Family: !Sub "${EnvAwsECSName}-${Environment}"
+      RequiresCompatibilities:
+        - EC2
+      Volumes:
+        - Name: !Sub "${EnvAwsECSName}-ebs"
+          Host: {}
+  # Load balancer - Target group - listener
+  LoadBalancerListener:
+    Type: "AWS::ElasticLoadBalancingV2::Listener"
+    Properties:
+      DefaultActions:
+        - Type: forward
+          TargetGroupArn: !Ref TargetGroup
+      LoadBalancerArn: !Ref EnvAwsLoadBalancerARN
+      Port: !Ref Port
+      Protocol: TCP
+  # Load balancer - Target group
+  TargetGroup:
+    Type: "AWS::ElasticLoadBalancingV2::TargetGroup"
+    Properties:
+      Tags:
+        - Key: "Project"
+          Value: !Ref EnvAwsTagProject
+      Name: !Sub "${EnvAwsECSName}-${Environment}"
+      HealthCheckIntervalSeconds: 30
+      HealthCheckTimeoutSeconds: 10
+      HealthyThresholdCount: 2
+      TargetType: instance
+      HealthCheckProtocol: TCP
+      Port: !Ref Port
+      Protocol: TCP
+      UnhealthyThresholdCount: 2
+      VpcId: !Ref EnvAwsVpcId
+  # Service
+  ECSService:
+    Type: "AWS::ECS::Service"
+    DependsOn: LoadBalancerListener
+    Properties:
+      Tags:
+        - Key: "Project"
+          Value: !Ref EnvAwsTagProject
+      ServiceName: !Ref EnvAwsECSName
+      TaskDefinition: !Ref TaskDefinition
+      DesiredCount: 1
+      LoadBalancers:
+        - TargetGroupArn: !Ref TargetGroup
+          ContainerPort: !Ref Port
+          ContainerName: !Sub "${EnvAwsECSName}-${Environment}"
+      Cluster: !Ref EnvAwsECSCluster
+      ServiceRegistries:
+        - ContainerName: !Sub "${EnvAwsECSName}-${Environment}"
+          ContainerPort: !Ref Port
+          RegistryArn: !Join
+            - ""
+            - - !Sub "arn:aws:servicediscovery:${EnvAwsRegion}:${EnvAwsAccount}:service/"
+              - !Ref ServiceDiscoveryDns
+  # Service discovery
+  ServiceDiscoveryDns:
+    Type: "AWS::ServiceDiscovery::Service"
+    Properties:
+      Tags:
+        - Key: "Project"
+          Value: !Ref EnvAwsTagProject
+      Name: fe-landing
+      Description: aglanding service discovery
+      DnsConfig:
+        DnsRecords:
+          - TTL: 10
+            Type: SRV
+        RoutingPolicy: MULTIVALUE
+        NamespaceId: !Ref EnvAwsServiceNamespace
+      HealthCheckCustomConfig:
+        FailureThreshold: 1

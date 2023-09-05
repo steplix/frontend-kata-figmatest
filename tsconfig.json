@@ -1,0 +1,51 @@
+{
+  "compilerOptions": {
+    "target": "es5",
+    "lib": ["dom", "dom.iterable", "esnext"],
+    "allowJs": true,
+    "skipLibCheck": true,
+    "strict": true,
+    "forceConsistentCasingInFileNames": true,
+    "noEmit": true,
+    "esModuleInterop": true,
+    "module": "esnext",
+    "moduleResolution": "node",
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+    "jsx": "preserve",
+    "incremental": true,
+    "baseUrl": ".",
+    "paths": {
+      "@/app/*": ["src/app/*"],
+      "@/common/*": ["src/common/*"],
+      "@/components/*": ["src/common/components/*"],
+      "@/utils/*": ["src/common/utils/*"],
+      "@/hooks/*": ["src/common/hooks/*"],
+      "@/config/*": ["src/common/config/*"],
+      "@/constants/*": ["src/common/constants/*"],
+      "@/styles/*": ["src/styles/*"],
+      "@/layouts/*": ["src/layouts/*"],
+      "@/modules/*": ["src/modules/*"],
+      "@/interfaces/*": ["src/interfaces/*"],
+      "@/pages/*": ["src/pages/*"],
+      "@/public/*": ["public/*"],
+      "@/public/assets/logos/*": ["public/assets/logos/*"],
+      "@/public/assets/icons/*": ["public/assets/icons/*"],
+      "@/public/assets/images/*": ["public/assets/images/*"]
+    }
+  },
+  "include": ["src", "next-env.d.ts", "**/*.ts", "**/*.tsx"],
+  "exclude": [
+    "node_modules",
+    "**/node_modules/*",
+    "build",
+    "**/build/*",
+    "out",
+    "**/out/*",
+    "dist",
+    ".vscode",
+    "coverage",
+    ".npm",
+    ".yarn"
+  ]
+}
