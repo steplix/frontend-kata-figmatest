@@ -28,7 +28,7 @@
     "@mui/x-data-grid": "^6.10.0",
     "@types/bluebird": "^3.5.38",
     "autoprefixer": "^10.4.0",
-    "axios": "^1.4.0",
+    "axios": "^1.6.2",
     "bluebird": "^3.7.2",
     "file-saver": "^2.0.5",
     "lodash": "^4.17.21",
